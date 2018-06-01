@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+
+<body>
+    <ul id="ul1">
+        <h1>Создание списка</h1>
+    </ul>
+
+<script>
+    function newTask() {
+        let node = document.createElement('Li');
+        let textNode = document.createTextNode(prompt('Что делать будем?', "1"));
+        if (textNode.textContent == 'null' || textNode.textContent == '') return;
+        node.appendChild(textNode);
+        document.getElementById('ul1').appendChild(node);
+        return setTimeout(newTask, 100);
+    }
+    newTask();
+
+</script>
+</body>
+</html>
