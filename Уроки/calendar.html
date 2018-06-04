@@ -63,6 +63,11 @@
             document.getElementById('table1').lastElementChild.appendChild(document.createElement('th'));
             document.getElementById('table1').lastElementChild.lastElementChild.textContent = i;
         }
+        if (document.getElementById('table1').lastElementChild.children.length < 7) {
+            for (let i = document.getElementById('table1').lastElementChild.children.length; i < 7; i++) {
+                document.getElementById('table1').lastElementChild.appendChild(document.createElement('th'));
+            }
+        }
     }
 
     createCalendar('calendar', prompt('year'), prompt('month'))
