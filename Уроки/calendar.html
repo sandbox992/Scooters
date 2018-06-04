@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        td,
+        th {
+            border: 1px solid black;
+            padding: 3px;
+            text-align: center;
+        }
+
+        th {
+            font-weight: bold;
+            background-color: #E6E6E6;
+        }
+    </style>
+    <meta charset="utf-8">
+</head>
+
+<body>
+
+
+<div id="calendar"></div>
+
+<script>
+    function createCalendar(id, year, month) {
+        let elem = document.getElementById(id);
+
+        let daysOfWeek = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
+        let daysInDate = new Date(year, month, 0).getDate();
+        let firstDayOfMonth = new Date(year, month - 1, 1).getDay();
+        firstDayOfMonth == 0 ? firstDayOfMonth = 7 : firstDayOfMonth;
+
+        //создаем шапку таблицы
+
+        elem.appendChild(document.createElement('table'));
+        elem.lastElementChild.setAttribute('id', 'table1');
+        document.getElementById('table1').appendChild(document.createElement('tr')); //если здесь использовать insertRow() - создается Tbody  и все посыпется
+
+        //наполняем первую строку днями недели
+
+        for (let i = 0; i < 7; i++) {
+            document.getElementById('table1').lastElementChild.appendChild(document.createElement('th'));
+            document.getElementById('table1').lastElementChild.lastElementChild.textContent = daysOfWeek[i];
+        }
+
+        //создаем пустые ячейки в начале календаря
+
+        document.getElementById('table1').insertRow();
+        for (let i = 1; i < firstDayOfMonth; i++) {
+            document.getElementById('table1').lastElementChild.appendChild(document.createElement('th'));
+        }
+
+        //Заполняем сам календарь
+
+        for (let i = 1; i < daysInDate + 1; i++) {
+            if (document.getElementById('table1').lastElementChild.children.length == 7) document.getElementById('table1').insertRow();
+            document.getElementById('table1').lastElementChild.appendChild(document.createElement('th'));
+            document.getElementById('table1').lastElementChild.lastElementChild.textContent = i;
+        }
+    }
+
+    createCalendar('calendar', prompt('year'), prompt('month'))
+</script>
+</body>
+
+</html>
