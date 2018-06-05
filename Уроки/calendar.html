@@ -18,6 +18,18 @@
             font-weight: bold;
             background-color: #E6E6E6;
         }
+        #today {
+            background-color: yellow;
+            border: 3px solid red;
+        }
+        input {
+            margin-top: 1%;
+            margin-right: 6%;
+            }
+        .center-button {
+            margin-left: 4%;
+            font-size: 40px;
+        }
     </style>
     <meta charset="utf-8">
 </head>
@@ -28,30 +40,36 @@
 <div id="calendar"></div>
 
 <script>
-    function createCalendar(id, year, month) {
+    let monthCounter = 0;
+    let yearCount = 0;
+    function createCalendar(id, year, month, dayz) {
         let elem = document.getElementById(id);
+        let mon = month - 1;
 
         let daysOfWeek = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
-        let daysInDate = new Date(year, month, 0).getDate();
-        let firstDayOfMonth = new Date(year, month - 1, 1).getDay();
+        const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+            "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        let daysInDate = new Date(year, mon + 1, 0).getDate();
+        let firstDayOfMonth = new Date(year, mon, 1).getDay();
         firstDayOfMonth == 0 ? firstDayOfMonth = 7 : firstDayOfMonth;
 
         //создаем шапку таблицы
 
         elem.appendChild(document.createElement('table'));
         elem.lastElementChild.setAttribute('id', 'table1');
+        document.getElementById('table1').appendChild(document.createElement('caption')).textContent = monthNames[mon] + ' ' + year;
         document.getElementById('table1').appendChild(document.createElement('tr')); //если здесь использовать insertRow() - создается Tbody  и все посыпется
 
         //наполняем первую строку днями недели
 
         for (let i = 0; i < 7; i++) {
-            document.getElementById('table1').lastElementChild.appendChild(document.createElement('th'));
-            document.getElementById('table1').lastElementChild.lastElementChild.textContent = daysOfWeek[i];
+            document.getElementById('table1').lastElementChild.appendChild(document.createElement('th')).textContent = daysOfWeek[i];
         }
 
         //создаем пустые ячейки в начале календаря
 
         document.getElementById('table1').insertRow();
+
         for (let i = 1; i < firstDayOfMonth; i++) {
             document.getElementById('table1').lastElementChild.appendChild(document.createElement('th'));
         }
@@ -62,16 +80,98 @@
             if (document.getElementById('table1').lastElementChild.children.length == 7) document.getElementById('table1').insertRow();
             document.getElementById('table1').lastElementChild.appendChild(document.createElement('th'));
             document.getElementById('table1').lastElementChild.lastElementChild.textContent = i;
+           if (i == dayz) {
+               document.getElementById('table1').lastElementChild.lastElementChild.setAttribute('id', 'today');
+           }
         }
+        //Добиваем пустыми ячейками в конце месяца
         if (document.getElementById('table1').lastElementChild.children.length < 7) {
             for (let i = document.getElementById('table1').lastElementChild.children.length; i < 7; i++) {
                 document.getElementById('table1').lastElementChild.appendChild(document.createElement('th'));
             }
         }
+        return
     }
 
-    createCalendar('calendar', prompt('year'), prompt('month'))
+    //  Кнопка для следующего дня
+
+    function nextDay() {
+        let elem = document.getElementById('today');
+        //if (elem.parentElement.nextElementSibling.firstElementChild == null ||  elem.nextElementSibling.textContent == '') return
+
+        if (elem.cellIndex === 6) {
+            if (elem.parentElement.nextElementSibling == null) return;
+            elem.removeAttribute('id');
+            elem.parentElement.nextElementSibling.firstElementChild.setAttribute('id', 'today')
+            return
+        }
+        if (elem.nextElementSibling.textContent == '') return;
+        elem.removeAttribute('id');
+        elem.nextElementSibling.setAttribute('id', 'today');
+        return
+    }
+
+    //  Кнопка для предыдущего дня
+
+    function prevDay() {
+        let elem = document.getElementById('today');
+        if (elem === document.getElementById('table1').rows[1].cells[0]) return  //Как вариант - использовать textContent
+
+
+        if (elem.cellIndex === 0) {
+            elem.removeAttribute('id');
+            elem.parentElement.previousElementSibling.lastElementChild.setAttribute('id', 'today')
+            return
+        }
+        if (elem.previousElementSibling.textContent == '') return;
+        elem.removeAttribute('id');
+        elem.previousElementSibling.setAttribute('id', 'today');
+        return
+    }
+    //функция возвращает на текущую дату (добавить if  - если текущий месяц? чтобы не перерисовывать календарь)
+    function refreshDay() {
+        let elem = document.getElementById('calendar');
+        elem.removeChild(document.getElementById('table1'));
+        createCalendar('calendar', today.getFullYear(), today.getMonth() + 1, today.getDate());
+        monthCounter = 0;
+        yearCount = 0;
+        }
+
+    //функция переносит на следующий месяц
+        function nextMonth() {
+            document.getElementById('calendar').removeChild(document.getElementById('table1'));
+            if (today.getMonth() + 1 + monthCounter == 12) {
+                monthCounter = today.getMonth() - 11;
+                yearCount++;
+            }
+
+            return createCalendar('calendar', today.getFullYear() + yearCount, today.getMonth() + 1 + ++monthCounter, 1)
+        }
+        //функция переносит на предыдущий месяц
+        function prevMonth() {
+            document.getElementById('calendar').removeChild(document.getElementById('table1'));
+            if (today.getMonth() + 1 + monthCounter == 1) {
+                monthCounter = today.getMonth() + 2;
+                yearCount--;
+            }
+
+            return createCalendar('calendar', today.getFullYear() + yearCount, today.getMonth() + 1 + --monthCounter, 1);
+
+        }
+    let today = new Date();
+    createCalendar('calendar', today.getFullYear(), today.getMonth() + 1, today.getDate())
+        
 </script>
+
+<input type="button" onclick="nextDay()" value="NextDay">
+
+<input type="button" onclick="prevDay()" value="PrevDay"><br/>
+
+<input type="button" onclick='nextMonth()' value="NextMonth" accesskey="n">
+
+<input type="button" style="margin-left: -4%" onclick="prevMonth()" value="PrevMonth" accesskey="m"><br/>
+
+<input class="center-button" type="button" onclick="refreshDay()" value="Today">
 </body>
 
 </html>
